@@ -22,9 +22,9 @@ tmp = assignvar('Region_IDs/IDs_1980_2002_ge_240_2005_2010_ge_48.mat');
 
 % Ids of the areas of interest
 %settings.region_ids   = [193 22 24 26 40 50 51 74 112 134 183 238 247 375 29];
-%settings.region_ids   = [193 24 26 51 112 134 183 247 375 29];
-settings.region_ids = [4 6 10 13 14 16 17 21 22 23 24 26 29 42 45 51 52 57 74 78 81 91 100 102 103]; 
-%settings.region_ids   = [29]; 
+settings.region_ids   = [193 24 26 51 112 134 183 247 375 29];
+%settings.region_ids = [4 6 10 13 14 16 17 21 22 23 24 26 29 42 45 51 52 57 74 78 81 91 100 102 103]; 
+settings.region_ids   = [29]; 
 %settings.region_ids = [4 6 10 13 14 16 17 21 22 23 24 26 29];
 % settings.region_names = tmp.Names_pred;
 

@@ -19,8 +19,6 @@ end
 
 refvec = dtevec(sdte, edte, settings.temp_res);
 
-size(refvec, 1)
-
 TS_in = varargin;
 
 if ~isempty(settings.val.prec.data)

@@ -1,4 +1,4 @@
-function [TS_flt_c, TS_flt_h, TS_flt_s, TS_smth_c, TS_smth_h, TS_smth_s, final_stats, final_stats_anom] = runfile(settings)
+function [TS_flt_c, TS_flt_h, TS_flt_s, TS_smth_c, TS_smth_h, TS_smth_s, final_stats, final_stats_anom] = EnKF_Runfile(settings)
 %%
 % -------------------------------------------------------------------------
 %                  MAIN CODE OF THE ENKF-ASSIMILATION
@@ -288,7 +288,7 @@ for i = settings.nts - 1:-1:2
     
     waitbar((settings.nts-i)/settings.nts)
 end
-close(br)
+close(br);
 
 
 % %% 6.   Re-arrange the observations and states in a data-structure
@@ -311,7 +311,7 @@ TS_smth_s = EnKF_Reshape(x_smth_s_mn, std_smth_s, errs_smth_s, ...
 [final_stats, final_stats_anom, P_val, E_val, R_val, TWSC_Val] = ...
        EnKF_Validation(settings, TS_flt_c, TS_flt_h, TS_flt_s, TS_smth_c, TS_smth_h, TS_smth_s);
 
-EnKF_display_output(settings, final_stats, final_stats_anom)
+EnKF_Show_Output(settings, final_stats, final_stats_anom)
 
 
 

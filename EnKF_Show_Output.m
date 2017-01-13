@@ -1,5 +1,5 @@
 
-function [] = EnKF_display_output(settings, stats, stats_anom)
+function [] = EnKF_Show_Output(settings, stats, stats_anom)
     
 if ~isempty(settings.assim.c_indx)
     % Format for the performance metrics
