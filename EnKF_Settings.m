@@ -14,9 +14,6 @@ settings.temp_res = 'monthly';
 % Name of the variable, which holds the catchment ids
 settings.id_var = 'regions';
 
-% Make plots (...or not?)
-settings.makeplts = 0;
-
 % Load the region IDs
 tmp = assignvar('Region_IDs/IDs_1980_2002_ge_240_2005_2010_ge_48.mat');
 
@@ -213,9 +210,6 @@ settings.constraints.ssnl    = true;
 % Start- and end-date of the assimilation period
 settings.assim.sdte = [2003 01];
 settings.assim.edte = [2013 12];
-
-% List of datasets for the prediction
-settings.assim.data = 'Data_subsets/prediction_data.mat';
 
 % Select a catchment for prediction
 % settings.assim.pred_regions = 1:50;
