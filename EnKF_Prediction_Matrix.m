@@ -65,21 +65,18 @@ if strcmp(settings.pred.avg, 'mean')
         
                     Bigmat = [squeeze(P(:, :, i)) squeeze(E(:, :, j)) ...
                                  squeeze(R(:, :, k)) squeeze(DM(:, :, l))];
-
+     
                     [sig_tmp, crr, t, p_tmp] = ...
                            nancov_matrix(Bigmat, Bigmat, 'pairwise', 1, 1);
                     [sig_d_tmp, crr, t, p_d_tmp] = ...
                            nancov_matrix(Bigmat(2:end, :), ...
                                      Bigmat(1:end-1, :), 'pairwise', 1, 1);
                     
-
-
                     if settings.pred.filter_sig == true
                         sig_tmp(p_tmp == 0) = 0;
                         sig_d_tmp(p_d_tmp == 0) = 0;
-                    end
-                    
-                    
+                    end        
+
                     sig   = sig + sig_tmp;
                     sig_d = sig_d + sig_d_tmp;
                     
@@ -168,25 +165,55 @@ if settings.pred.makesymmetric == true
     end
 end
 
+% if settings.pred.fix_cov == true 
+%     % If Q is not positive-semi-definite, we can try to repair the matrix.
+%     % However, depending on the "level" of non-positive-definiteness, this 
+%     % can seriously damange the covariance structure and thus produce
+%     % unreasonable results... 
+% 
+%     EPS = 10^-6;
+%     ZERO = 10^-10;
+% 
+%     if iscell(Q)
+%         for i = 1:length(Q)
+%             [V, D]       = eig(Q{i});
+%             D(D <= ZERO) = EPS;
+%             Q{i}         = V*diag(diag(D))*V';
+%         end
+%     else
+%         [V, D]       = eig(Q);
+%         D(D <= ZERO) = EPS;
+%         Q            = V*diag(diag(D))*V';
+%     end
+
+
 if settings.pred.fix_cov == true 
-    % If Q is not positive-semi-definite, we can try to repair the matrix.
-    % However, depending on the "level" of non-positive-definiteness, this 
-    % can seriously damange the covariance structure and thus produce
-    % unreasonable results... 
-
-    EPS = 10^-6;
-    ZERO = 10^-10;
-
-    if iscell(Q)
-        for i = 1:length(Q)
-            [V, D]       = eig(Q{i});
-            D(D <= ZERO) = EPS;
-            Q{i}         = V*diag(diag(D))*V';
+%     % If Q is not positive-semi-definite, we can try to repair the matrix.
+%     % However, depending on the "level" of non-positive-definiteness, this 
+%     % can seriously damange the covariance structure and thus produce
+%     % unreasonable results... 
+    [V, D] = eig(Q);   
+    dg_V   = diag(V);
+    
+    % Sum of the eigenvalues
+    S      = sum(dg_V);
+    W      = S^2*100 + 1;
+    
+    % Put the negative eigenvalues in a vector
+    neg_V  = dg_V(dg_V < 0);
+    neg_V(neg_V == 0) = NaN;
+    
+    P = abs(min(abs(neg_V)));
+    
+    for i = 1:length(neg_V)
+        if ~isnan(neg_V(i))
+            neg_V(i) = P*(S - neg_V(i))^2/W;
+            dg_V(i) = neg_V(i);
         end
-    else
-        [V, D]       = eig(Q);
-        D(D <= ZERO) = EPS;
-        Q            = V*diag(diag(D))*V';
+        
     end
+    
+    Q = V*diag(dg_V)*V';
+
 end
 

@@ -307,11 +307,11 @@ TS_smth_h = EnKF_Reshape(x_smth_h_mn, std_smth_h, errs_smth_h, ...
 TS_smth_s = EnKF_Reshape(x_smth_s_mn, std_smth_s, errs_smth_s, ...
                                             settings, settings.sources{6});
 
-                                    
+
 [final_stats, final_stats_anom, P_val, E_val, R_val, TWSC_Val] = ...
        EnKF_Validation(settings, TS_flt_c, TS_flt_h, TS_flt_s, TS_smth_c, TS_smth_h, TS_smth_s);
 
-EnKF_Show_Output(settings, final_stats, final_stats_anom)
+%EnKF_Show_Output(settings, final_stats, final_stats_anom)
 
 
 

@@ -18,13 +18,8 @@ settings.id_var = 'regions';
 tmp = assignvar('Region_IDs/IDs_1980_2002_ge_240_2005_2010_ge_48.mat');
 
 % Ids of the areas of interest
-%settings.region_ids   = [193 22 24 26 40 50 51 74 112 134 183 238 247 375 29];
-settings.region_ids   = [193 24 26 51 112 134 183 247 375 29];
-%settings.region_ids = [4 6 10 13 14 16 17 21 22 23 24 26 29 42 45 51 52 57 74 78 81 91 100 102 103]; 
-settings.region_ids   = [29]; 
-%settings.region_ids = [4 6 10 13 14 16 17 21 22 23 24 26 29];
-% settings.region_names = tmp.Names_pred;
-
+%settings.region_ids   = [4 6 10 13 14 16 17 21 22 23 24 29 51 52 193 375];
+settings.region_ids    = [29 193 375];
 %--------------------------------------------------------------------------
 %                 Parameter for the prediction function
 %--------------------------------------------------------------------------
@@ -40,14 +35,32 @@ settings.region_ids   = [29];
 % where the data is stored.
 settings.pred.data = assignvar('Data_subsets/long_term_data.mat');
 
-% Start- and end-date for the statistics
+% Start- and end-date for the time-period, from which the prediction matrix
+% will be derived
 settings.pred.sdte = [1980 01];
-settings.pred.edte = [2002 12];
+settings.pred.edte = [2010 12];
 
 % Averaging of the covariance matrices
+% TBA: More options
 settings.pred.avg = 'mean';
 
-% Select the prediction matrix approach
+% settings.pred.method: Select the prediction matrix approach
+% Currently, the function supports 4 approaches, which can be chosen by the
+% following numbers:
+% 1: Use a fully populated prediction matrix (i.e. dependencies between
+%    regions and variables)
+% 2: Use only dependencies between regions, but not between variables
+% 3: Use only dependencies between variables, but not between regions
+% 4: User-defined masking matrix, which is multiplied with the auto- and
+%    cross-covariance matrix. If settings.pred.method is set to 4, the user
+%    must supply a masking matrix (settings.pred.loc_matrix), which is 
+%    similar to the follwing example:
+%    I = ones(length(settings.region_ids), length(settings.region_ids));
+%    E = eye(length(settings.region_ids), length(settings.region_ids));
+%    settings.pred.loc_matrix = [E E E E;
+%                                E E E E;
+%                                E E I E;
+%                                E E E E];
 settings.pred.method = 1;
 
 % Remove seasonal cycle for the least-squares prediction?
@@ -63,18 +76,12 @@ settings.pred.filter_twsc   = false;
 settings.pred.filter_sig = false;
 
 % Switch for "repairing" not positive-definite matrices
-settings.pred.fix_cov = true;
+settings.pred.fix_cov = false;
 
 % Enforce symmetry of the covariance matrices
-settings.pred.makesymmetric = true;
+settings.pred.makesymmetric = false;
 
-I = ones(length(settings.region_ids), length(settings.region_ids));
-E = eye(length(settings.region_ids), length(settings.region_ids));
 
-settings.pred.loc_matrix = [E E E E;
-                            E E E E;
-                            E E I E;
-                            E E E E];
 %--------------------------------------------------------------------------
 %                 Parameter for the control input
 %--------------------------------------------------------------------------
@@ -84,7 +91,7 @@ settings.cntrl.data = assignvar('Data_subsets/long_term_data.mat');
 
 % Start- and end-date for the control input
 settings.cntrl.sdte = [1980 01];
-settings.cntrl.edte = [2002 12];
+settings.cntrl.edte = [2010 12];
 
 % Apply the [1/4 1/2 1/4]-filter to the data?
 settings.cntrl.filter  = false;
@@ -92,11 +99,9 @@ settings.cntrl.filter  = false;
 %--------------------------------------------------------------------------
 %                 Parameter for the observation function
 %--------------------------------------------------------------------------
-settings.obs.data   = assignvar('Data_subsets/obs_data.mat');
+settings.obs.data   = assignvar('Data_subsets/long_term_data.mat');
 settings.obs.remsc  = false;
 settings.obs.filter = false;
-
-
 
 
 %--------------------------------------------------------------------------
@@ -104,20 +109,32 @@ settings.obs.filter = false;
 %--------------------------------------------------------------------------
 settings.obscov.data_back  = assignvar('Data_subsets/long_term_data.mat');
 settings.obscov.sdte_back  = [1980 01];
-settings.obscov.edte_back  = [2002 12];
+settings.obscov.edte_back  = [2010 12];
 settings.obscov.flt_back   = false;
 settings.obscov.remsc_back = true;
 
-settings.obscov.data_scle  = assignvar('Data_subsets/obs_data.mat');
-settings.obscov.sdte_scle  = [2003 01];
-settings.obscov.edte_scle  = [2013 12];
+settings.obscov.data_scle  = assignvar('Data_subsets/long_term_data.mat');
+settings.obscov.sdte_scle  = [1980 01];
+settings.obscov.edte_scle  = [2010 12];
 settings.obscov.flt_scle   = false;
 settings.obscov.remsc_scle = true;
 
 % Select a method for deriving errors 
-settings.obscov.errs_P.method  = 'ensemble';
+% settings.obscov.errs_P.method  = 'ensemble';
 
-settings.obscov.errs_E.method  = 'ensemble';
+settings.obscov.errs_P.method  = 'percentage';
+settings.obscov.errs_P.data    = 'http://imk-ifu-thred1.imk-ifu.kit.edu:8080/thredds/dodsC/Area_averages/GPCC_v7.0_PREC_GRDC_Basins.nc';
+settings.obscov.errs_P.varnme  = 'prec';
+settings.obscov.errs_P.value   = 0.2;
+settings.obscov.errs_P.remsc   = false;
+settings.obscov.errs_P.filter  = false;
+
+settings.obscov.errs_E.method  = 'percentage';
+settings.obscov.errs_E.data    = 'http://imk-ifu-thred1.imk-ifu.kit.edu:8080/thredds/dodsC/Area_averages/GLEAM_v3.0a_evap_mnthly_GRDC_Basins.nc';
+settings.obscov.errs_E.varnme  = 'evap';
+settings.obscov.errs_E.value   = 0.4;
+settings.obscov.errs_E.remsc   = false;
+settings.obscov.errs_E.filter  = false;
 
 settings.obscov.errs_R.method  = 'percentage';
 settings.obscov.errs_R.data    = 'http://imk-ifu-thred1.imk-ifu.kit.edu:8080/thredds/dodsC/Area_averages/GRDC_Runoff_2014.nc';
@@ -196,7 +213,7 @@ settings.obscov.errs_dm_alt       = [];
 settings.constraints.method  = 'percentage';
 settings.constraints.data    = 'http://imk-ifu-thred1.imk-ifu.kit.edu:8080/thredds/dodsC/Area_averages/GRDC_Runoff_2014.nc';
 settings.constraints.varnme  = 'runoff';
-settings.constraints.value   = 0.5;
+settings.constraints.value   = 0.2;
 settings.constraints.remsc   = false;
 settings.constraints.filter  = false;
 settings.constraints.ssnl    = true;
@@ -208,17 +225,17 @@ settings.constraints.ssnl    = true;
 %                 Parameter for the assimilation
 %--------------------------------------------------------------------------
 % Start- and end-date of the assimilation period
-settings.assim.sdte = [2003 01];
-settings.assim.edte = [2013 12];
+settings.assim.sdte = [1980 01];
+settings.assim.edte = [2010 12];
 
 % Select a catchment for prediction
 % settings.assim.pred_regions = 1:50;
-settings.assim.pred_regions = 29;
+settings.assim.pred_regions = [];
 % settings.assim.pred_names   = tmp.Names_val;
 
 % Select a variable for prediction
 % 1: Precipitation; 2: Evapotranspiration; 3: Runoff; 4: Water storage
-settings.assim.pred_vars  = 3;
+settings.assim.pred_vars  = [];
 
 % Select the number of months for the training period
 settings.assim.spinup = 0;
@@ -244,8 +261,8 @@ settings.val.evap.varnme   = [];
 settings.val.runoff.data   = 'http://imk-ifu-thred1.imk-ifu.kit.edu:8080/thredds/dodsC/Area_averages/GRDC_Runoff_2014.nc';
 settings.val.runoff.varnme = 'runoff';
 
-settings.val.twsc.data       = [];
-settings.val.twsc.varnme     = [];
+settings.val.twsc.data     = [];
+settings.val.twsc.varnme   = [];
 
 settings.val.perfmeasures  = {'nse', 'corr', 'rmse'};
 
